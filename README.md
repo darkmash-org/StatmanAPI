@@ -5,6 +5,11 @@
 
 API for doing status related cool stuff on Discord || StatmanAPI || API
 
+## Features :
+     
+     - Rolls back to your previous configurations once stopped.
+
+
 ## Use :
 
 To use the service [GET - method] ,
