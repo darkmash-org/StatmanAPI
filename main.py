@@ -46,7 +46,7 @@ def main_func_():
       /service/lt/{type}/{txt}  - > loading + text <br> 
       /service/stop - > Stop the users processes <br>
       
-        &nbsp &nbsp <type> Should be 0 or 1.. <br>
+        &nbsp &nbsp {type} Should be 0 or 1.. <br>
       
       With headers ~ <br>
       &nbsp &nbsp token:token of discord<br> 
@@ -61,7 +61,7 @@ def stop():
     WORKERS[token] = False
     return "Done"
   except:
-    return "No user found"
+    return "Notfound"
 
 
 @app.route('/service/wbw/<txt>', methods=['GET'])
@@ -70,6 +70,11 @@ def wbw(txt):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
+  try:
+    WORKERS.get(request.headers.get("token"))
+    return "RUNNING"
+  except:
+    pass
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -95,6 +100,11 @@ def ca(txt):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
+  try:
+    WORKERS.get(request.headers.get("token"))
+    return "RUNNING"
+  except:
+    pass
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -119,6 +129,11 @@ def l(type):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
+  try:
+    WORKERS.get(request.headers.get("token"))
+    return "RUNNING"
+  except:
+    pass
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -157,6 +172,11 @@ def lt(type, txt):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
+  try:
+    WORKERS.get(request.headers.get("token"))
+    return "RUNNING"
+  except:
+    pass
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
