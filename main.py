@@ -5,11 +5,13 @@ By ~ Darkmash
 """
 
 from flask import Flask, request
+from flask_cors import CORS
 import requests as r
 import logging
 import time
 
 app = Flask(__name__)
+CORS(app)
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -57,10 +59,10 @@ def main_func_():
 @app.route('/service/stop', methods=['GET'])
 def stop():
   token = request.headers.get("token")
-  try:
+  if not WORKERS.get(token) == None:
     WORKERS[token] = False
     return "Done"
-  except:
+  else:
     return "Notfound"
 
 
@@ -70,11 +72,11 @@ def wbw(txt):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
-  try:
-    WORKERS.get(request.headers.get("token"))
-    return "RUNNING"
-  except:
+  if None ==   WORKERS.get(request.headers.get("token")) :
     pass
+  else:
+    return "RUNNING"
+  
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -100,11 +102,11 @@ def ca(txt):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
-  try:
-    WORKERS.get(request.headers.get("token"))
-    return "RUNNING"
-  except:
+  if None ==   WORKERS.get(request.headers.get("token")) :
     pass
+  else:
+    return "RUNNING"
+    
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -112,7 +114,7 @@ def ca(txt):
   if a.status_code == 401:
     return "Invalid Token"
   status = txt
-  while True:
+  while WORKERS[request.headers.get("token")]:
     a_ = ""
     for s in status:
       a_ = a_ + s
@@ -121,7 +123,8 @@ def ca(txt):
       time.sleep(0.1)
     a_ = ""
     time.sleep(1)
-
+  del WORKERS[request.headers.get("token")]
+  return "ENDED"
 
 @app.route('/service/l/<type>', methods=['GET'])
 def l(type):
@@ -129,11 +132,11 @@ def l(type):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
-  try:
-    WORKERS.get(request.headers.get("token"))
-    return "RUNNING"
-  except:
+  if None ==   WORKERS.get(request.headers.get("token")) :
     pass
+  else:
+    return "RUNNING"
+    
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -147,7 +150,7 @@ def l(type):
   else:
     status = "❚" * 5
     l = 5
-  while True:
+  while WORKERS[request.headers.get("token")]:
     a_ = ""
     ad = round(100 / l)
     p = 0
@@ -164,7 +167,8 @@ def l(type):
       time.sleep(0.25)
     a_ = ""
     time.sleep(3)
-
+  del WORKERS[request.headers.get("token")]
+  return "ENDED"
 
 @app.route('/service/lt/<type>/<txt>', methods=['GET'])
 def lt(type, txt):
@@ -172,11 +176,11 @@ def lt(type, txt):
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
   }
-  try:
-    WORKERS.get(request.headers.get("token"))
-    return "RUNNING"
-  except:
+  if None ==   WORKERS.get(request.headers.get("token")) :
     pass
+  else:
+    return "RUNNING"
+    
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -191,7 +195,7 @@ def lt(type, txt):
   else:
     status = "❚" * 5
     l = 5
-  while True:
+  while WORKERS[request.headers.get("token")]:
     a_ = ""
     ad = round(100 / l)
     p = 0
@@ -211,6 +215,7 @@ def lt(type, txt):
     payload = {"custom_status": {"text": status_}}
     a = r.patch(url, headers=headers, json=payload)
     time.sleep(2)
-
+  del WORKERS[request.headers.get("token")]
+  return "ENDED"
 
 app.run(host="0.0.0.0", port=8080)
