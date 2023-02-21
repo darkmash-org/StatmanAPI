@@ -8,7 +8,7 @@ API for doing status related cool stuff on Discord || StatmanAPI || API
 
 ## Features :
     
-  - Rerolls the previous status configs..
+  - Rerolls the previous status configs.. [On Stopping]
 
 ## Use :
 
