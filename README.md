@@ -32,6 +32,5 @@ To use the service [GET - method] ,
 With header ~
     
     token:token of discord
-    
     text:text for status
     
