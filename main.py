@@ -8,6 +8,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import requests as r
 import logging
+import json
 import time
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 WORKERS = {}
-
+OLD = {}
 
 @app.route('/')
 def main_func_():
@@ -39,25 +40,26 @@ def main_func_():
     />
         <title>STATMAN API ~ Darkmash</title>
 
-  ######## DARKMASH ~ STATMAN API ~ V.1.0.0 ###################<br>
+  ######## DARKMASH ~ STATMAN API ~ V.1.0.1 ###################<br>
   To use the service [GET - method] ,<br>
       /service/wbw/
-      {txt} - > word by word (txt should be sep with ~~~ for each break)<br> 
-      /service/ca/{txt}  - > cascading animation <br> 
+      {txt} - > word by word (txt should be sep with ~~~ for each break (in the headers with text:text) )<br> 
+      /service/ca/  - > cascading animation <br> 
       /service/l/{type}   - > loading <br> 
-      /service/lt/{type}/{txt}  - > loading + text <br> 
+      /service/lt/{type} - > loading + text <br> 
       /service/stop - > Stop the users processes <br>
       
         &nbsp &nbsp {type} Should be 0 or 1.. <br>
       
       With headers ~ <br>
       &nbsp &nbsp token:token of discord<br> 
-  ##############################################################
+      &nbsp &nbsp text:text for status<br> 
+      ##############################################################
   """
-
 
 @app.route('/service/stop', methods=['GET'])
 def stop():
+  print("API_CALL")
   token = request.headers.get("token")
   if not WORKERS.get(token) == None:
     WORKERS[token] = False
@@ -66,8 +68,11 @@ def stop():
     return "Notfound"
 
 
-@app.route('/service/wbw/<txt>', methods=['GET'])
-def wbw(txt):
+@app.route('/service/wbw', methods=['GET'])
+def wbw():
+  print("API_CALL")
+  
+  txt =  request.headers.get("text")
   headers = {
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
@@ -77,12 +82,19 @@ def wbw(txt):
   else:
     return "RUNNING"
   
+  sts = r.get("https://discord.com/api/v9/users/@me/settings", headers=headers)
+
+  OLD.setdefault(request.headers.get("token"), json.loads(sts.text)["custom_status"])    
+  
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
   a = r.patch(url, headers=headers, json=payload)
   if a.status_code == 401:
     return "Invalid Token"
+
+
+
   stats_inp = txt.split("~~~")
   WORKERS.setdefault(request.headers.get("token"), True)
   while WORKERS[request.headers.get("token")]:
@@ -92,12 +104,22 @@ def wbw(txt):
       time.sleep(1)
     time.sleep(1.5)
 
+
+  
+  payload = {"custom_status": OLD[request.headers.get("token")]}
+  a = r.patch(url, headers=headers, json=payload)
+  
+  del OLD[request.headers.get("token")]
   del WORKERS[request.headers.get("token")]
+
   return "ENDED"
 
 
-@app.route('/service/ca/<txt>', methods=['GET'])
-def ca(txt):
+@app.route('/service/ca', methods=['GET'])
+def ca():
+  print("API_CALL")
+
+  txt =  request.headers.get("text")
   headers = {
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
@@ -106,7 +128,11 @@ def ca(txt):
     pass
   else:
     return "RUNNING"
-    
+
+  sts = r.get("https://discord.com/api/v9/users/@me/settings", headers=headers)
+
+  OLD.setdefault(request.headers.get("token"), json.loads(sts.text)["custom_status"])    
+
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -123,11 +149,18 @@ def ca(txt):
       time.sleep(0.1)
     a_ = ""
     time.sleep(1)
+  
+  payload = {"custom_status": OLD[request.headers.get("token")]}
+  a = r.patch(url, headers=headers, json=payload)
+  
+  del OLD[request.headers.get("token")]
   del WORKERS[request.headers.get("token")]
   return "ENDED"
 
 @app.route('/service/l/<type>', methods=['GET'])
 def l(type):
+  print("API_CALL")
+
   headers = {
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
@@ -136,7 +169,11 @@ def l(type):
     pass
   else:
     return "RUNNING"
-    
+
+  sts = r.get("https://discord.com/api/v9/users/@me/settings", headers=headers)
+
+  OLD.setdefault(request.headers.get("token"), json.loads(sts.text)["custom_status"])    
+
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -167,11 +204,20 @@ def l(type):
       time.sleep(0.25)
     a_ = ""
     time.sleep(3)
+  
+  payload = {"custom_status": OLD[request.headers.get("token")]}
+  a = r.patch(url, headers=headers, json=payload)
+  
+  del OLD[request.headers.get("token")]
   del WORKERS[request.headers.get("token")]
   return "ENDED"
 
-@app.route('/service/lt/<type>/<txt>', methods=['GET'])
-def lt(type, txt):
+@app.route('/service/lt/<type>', methods=['GET'])
+def lt(type):
+  print("API_CALL")
+
+  txt =  request.headers.get("text")
+
   headers = {
     "authorization": request.headers.get("token"),
     "user-agent": request.headers.get("user-agent")
@@ -180,7 +226,11 @@ def lt(type, txt):
     pass
   else:
     return "RUNNING"
-    
+
+  sts = r.get("https://discord.com/api/v9/users/@me/settings", headers=headers)
+
+  OLD.setdefault(request.headers.get("token"), json.loads(sts.text)["custom_status"])    
+
   payload = {"custom_status": {"text": ""}}
   url = 'https://discord.com/api/v9/users/@me/settings'
 
@@ -215,6 +265,11 @@ def lt(type, txt):
     payload = {"custom_status": {"text": status_}}
     a = r.patch(url, headers=headers, json=payload)
     time.sleep(2)
+  
+  payload = {"custom_status": OLD[request.headers.get("token")]}
+  a = r.patch(url, headers=headers, json=payload)
+  
+  del OLD[request.headers.get("token")]
   del WORKERS[request.headers.get("token")]
   return "ENDED"
 
