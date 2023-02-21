@@ -1,9 +1,14 @@
-# StatmanAPI
+# StatmanAPI 1.0.1
 
 <p class="views" align="right"><img src="https://komarev.com/ghpvc/?username=darkmash-org-statman&label=Project%20views&color=0e75b6&style=flat" alt="darkmash-org" /></p>
 
 
 API for doing status related cool stuff on Discord || StatmanAPI || API
+
+
+## Features :
+    
+  - Rerolls the previous status configs..
 
 ## Use :
 
